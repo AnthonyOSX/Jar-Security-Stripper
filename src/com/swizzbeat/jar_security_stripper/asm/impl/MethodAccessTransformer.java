@@ -18,7 +18,7 @@ public class MethodAccessTransformer extends AbstractTransformer {
         for (MethodNode mn : (Iterable<MethodNode>) node.methods) {
             if ((mn.access & Opcodes.ACC_FINAL) > 0) {
                 //mn.access |= (~Opcodes.ACC_FINAL | Opcodes.ACC_PUBLIC);
-                mn.access = mn.access & (~Opcodes.ACC_FINAL);
+                mn.access &= ~Opcodes.ACC_FINAL;
             }
         }
     }

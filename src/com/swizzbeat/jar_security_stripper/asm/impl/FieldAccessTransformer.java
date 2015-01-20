@@ -18,7 +18,7 @@ public class FieldAccessTransformer extends AbstractTransformer {
         for (FieldNode fn : (Iterable<FieldNode>) node.fields) {
             if ((fn.access & Opcodes.ACC_FINAL) > 0) {
                 //fn.access |= (~Opcodes.ACC_FINAL | Opcodes.ACC_PUBLIC);
-                fn.access = fn.access & (~Opcodes.ACC_FINAL);
+                fn.access &= ~Opcodes.ACC_FINAL;
             }
         }
     }

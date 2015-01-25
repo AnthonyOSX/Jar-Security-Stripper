@@ -19,8 +19,10 @@ public class Main {
         File jarFile = promptForJarFile();
 
         if (jarFile != null) {
+            JarAccessModifier modifier = new JarAccessModifier();
+
             try {
-                JarModifier.run(jarFile);
+                modifier.run(jarFile);
             } catch (IOException e) {
                 StringWriter sw = new StringWriter();
 

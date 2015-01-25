@@ -17,26 +17,22 @@ import java.util.jar.*;
  * Date: 12/19/14
  */
 
-public class JarModifier {
+public class JarAccessModifier {
 
-    private static final Map<String, ClassNode> classes;
-    private static final List<AbstractTransformer> transformers;
+    private final Map<String, ClassNode> classes;
+    private final List<AbstractTransformer> transformers;
 
-    private static Manifest manifest;
-
-    static {
+    public JarAccessModifier() {
         classes = new HashMap<>();
         transformers = new ArrayList<>();
     }
 
-    private JarModifier() {
-        // Singleton
-    }
+    public void run(File file) throws IOException {
+        JarFile jarFile = new JarFile(file);
 
-    public static void run(File file) throws IOException {
         System.out.println("Loading jar into memory...");
 
-        loadJar(new JarFile(file));
+        loadJar(jarFile);
 
         System.out.println("Transforming classes...");
 
@@ -45,12 +41,12 @@ public class JarModifier {
 
         System.out.println("Writing modified jar file...");
 
-        dumpJar(file);
+        dumpJar(file, jarFile.getManifest());
 
         System.out.println("Modifications complete.");
     }
 
-    private static void loadJar(JarFile jar) throws IOException {
+    private void loadJar(JarFile jar) throws IOException {
         Enumeration<JarEntry> enumeration = jar.entries();
 
         while (enumeration.hasMoreElements()) {
@@ -66,11 +62,9 @@ public class JarModifier {
                 }
             }
         }
-
-        manifest = jar.getManifest();
     }
 
-    private static void dumpJar(File file) throws IOException {
+    private void dumpJar(File file, Manifest manifest) throws IOException {
         try (JarOutputStream jos = new JarOutputStream(new FileOutputStream(file), manifest)) {
             for (ClassNode cn : classes.values()) {
                 ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
@@ -82,12 +76,12 @@ public class JarModifier {
         }
     }
 
-    private static void loadTransformers() {
+    private void loadTransformers() {
         transformers.add(new FieldAccessTransformer());
         transformers.add(new MethodAccessTransformer());
     }
 
-    private static void runTransformers() {
+    private void runTransformers() {
         for (ClassNode cn : classes.values()) {
             for (AbstractTransformer t : transformers) {
                 t.run(cn);
